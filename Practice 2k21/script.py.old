@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+# Author : Arpan Mahanty
+# Team : Komodo
+
+# Configuration
+name = 'b_little_bit_of_everything'
+input_fname = name + '.in'
+output_fname = name + '.out'
+
+
+# Import Required Libraries
+import numpy as np
+from itertools import combinations
+import os
+from tqdm import tqdm
+
+# Read Import File
+print('[INFO]: Reading File (%s)' %os.path.abspath(input_fname))
+with open(input_fname,'r') as stdin:
+    T = [None]+list(map(int, stdin.readline().split()))
+    N = T[1]
+    
+    pizza = np.empty(N, dtype=list)
+    for i in range(N):
+        pizza[i] = list(stdin.readline().split()[1:])
+
+print('# of Pizza : %d' %N)
+print('# of 2 Member Team : %d' %T[2])
+print('# of 3 Member Team : %d' %T[3])
+print('# of 4 Member Team : %d' %T[4])
+print('[INFO]: Completed')
+print()
+
+# Score Computation ( Pre-computes the scores for each combination and stores it. )
+def create_score(r):
+    score = {}
+    for idx in tqdm(combinations(range(N), r)):
+        a = np.unique(np.sum(pizza[list(idx)]))
+        score[idx] = len(a)**2
+    return score
+
+print('[INFO]: Computing scores (2)')
+score2d = create_score(2)
+
+print('[INFO]: Computing scores (3)')
+score3d = create_score(3)
+
+print('[INFO]: Computing scores (4)')
+score4d = create_score(4)
+print('[INFO]: Completed')
+print()
+
+
+# Initialize a list containing the pizza indexes in stock.
+undelivered_pizzas = list(range(N))
+
+def get_pizza():
+    m = 0
+    res = []
+    
+    
+    for idx in combinations(undelivered_pizzas, 2):
+        if score2d[idx] > m and T[2] > 0:
+            res = idx
+            m = score2d[idx]
+    
+    for idx in combinations(undelivered_pizzas, 3):
+        if score3d[idx] > m and T[3] > 0:
+            res = idx
+            m = score3d[idx]
+    
+    for idx in combinations(undelivered_pizzas, 4):
+        if score4d[idx] > m and T[4] > 0:
+            res = idx
+            m = score4d[idx]
+    
+    if res:
+        T[len(res)] -= 1
+    
+    for i in res:
+        undelivered_pizzas.remove(i)
+    return res, m
+
+
+# Deliver Pizza
+print('[INFO]: Delivering Pizza')
+total_score = 0
+results = []
+while(1):
+    idx, s = get_pizza()
+    total_score += s
+    if not idx:
+        break
+    else:
+        print('Pizza Delivery !!!',idx,' Score:', total_score)
+    results.append(idx)
+print('[INFO]: Completed')
+print()
+
+print('Total Score = ',total_score)
+
+
+# Write output to file
+print('[INFO]: Writing File (%s)' %os.path.abspath(output_fname))
+with open(output_fname,'w') as stdout:
+    stdout.write(str(len(results)))
+    for res in tqdm(results):
+        stdout.write('\n'+str(len(res))+' '+' '.join(map(str, res)))
+print('[INFO]: Completed')
+print()
