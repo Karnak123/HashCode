@@ -15,14 +15,16 @@ struct Street {
 	}
 };
 
-vector<pair<int, Street>> streets[IMX];
+unordered_map<int, vector<pair<int, Street>>> streets;
 map<string, pair<int, int>> street_names;
 vector<string> paths[VMX];
-
 
 int main(){
 	int D, I, S, V, F;
 	cin>>D>>I>>S>>V>>F;
+	unordered_map<int, queue<int>> in_cars;	// i-th car maps to streets left to take
+	vector<pair<int, pair<int, int>>> in_transit;	// <time, <i-th car, to_intersection>>
+	vector<pair<int, pair<string, int>>> ans(I);
 
 	// input streets
 	for (int i=0; i<S; ++i) {
@@ -43,6 +45,26 @@ int main(){
 			cin>>s;
 			paths[i].emplace_back(s);
 		}
+		in_cars[street_names[paths[i][0]].second].push(i);
+	}
+
+	// run simulation
+	for (int t=0; t<D; ++t) {
+
+		for (int i=0; i<in_transit.size(); ++i) {
+			// move car from street to intersection queue if transit time complete
+			if (in_transit[i].first==1){
+				in_cars[street_names[paths[in_transit[i].second.second][0]].second].push(in_transit[i].second.first);
+				in_transit.erase(in_transit.begin() + i);
+				--i;
+			}
+			// else reduce transit time
+			else {
+				--in_transit[i].first;
+			}
+		}
+
+
 	}
 	return (0);
 }
