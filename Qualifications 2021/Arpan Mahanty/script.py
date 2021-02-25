@@ -1,5 +1,5 @@
 import random
-
+ 
 [D, I, S, V, F] = [int(k) for k in input().split()]
 
 class street:
@@ -19,7 +19,7 @@ STREETS = {}
 for s in range(S):
     [B, E, name, L] = input().split()
     STREETS[name] = street(int(B), int(E), int(L))
-
+ 
 CAR_PATH = []
 
 for v in range(V):
