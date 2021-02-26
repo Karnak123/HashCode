@@ -1,0 +1,1 @@
+python %1.py < input/%2.txt > output/%2.out
